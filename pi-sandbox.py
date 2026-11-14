@@ -27,7 +27,7 @@ import sys
 import tempfile
 import urllib.request
 
-DEFAULT_IMAGE = "pi-sandbox:latest"
+DEFAULT_IMAGE = "pi-sandbox:v2"
 DEFAULT_MODEL_HOST = "127.0.0.1"
 DEFAULT_MODEL_PORT = 8090
 GUEST_WORKDIR = "/workspace"
@@ -40,7 +40,8 @@ FROM node:24-bookworm-slim
 RUN apt-get update \\
   && apt-get install -y --no-install-recommends bash ca-certificates git ripgrep curl \\
   && rm -rf /var/lib/apt/lists/*
-RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent pnpm
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 WORKDIR /workspace
 """
@@ -215,7 +216,7 @@ def main() -> None:
                    help=f"published port of the model container (default {DEFAULT_MODEL_PORT})")
     p.add_argument("--model-id", default=None,
                    help="model id to use (default: first model served by the container)")
-    p.add_argument("--context-window", type=int, default=32768, help="context window in tokens")
+    p.add_argument("--context-window", type=int, default=60000, help="context window in tokens")
     p.add_argument("--reasoning", action="store_true", help="mark the model as reasoning-capable")
     p.add_argument("--no-internet", action="store_true",
                    help="block all external network access except the model endpoint and DNS")
